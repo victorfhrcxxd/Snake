@@ -115,14 +115,14 @@ function checkCollision(player) {
     
     // Modo Classic: Cobra nao atravessa paredes laterais
     if (gameState.gameMode === 'classic') {
-        if (head.x < 0 || head.x >= 600 || head.y < 0 || head.y >= 400) {
+        if (head.x < 0 || head.x >= gameState.gameWidth || head.y < 0 || head.y >= gameState.gameHeight) {
             return true;
         }
     }
     
     // Modo Battle: Cobra morre quando bate nas laterais
     if (gameState.gameMode === 'battle') {
-        if (head.x < 0 || head.x >= 600 || head.y < 0 || head.y >= 400) {
+        if (head.x < 0 || head.x >= gameState.gameWidth || head.y < 0 || head.y >= gameState.gameHeight) {
             return true;
         }
     }
@@ -143,15 +143,15 @@ function checkCollision(player) {
     
     // Outros jogadores (modo batalha)
     if (gameState.gameMode === 'battle') {
-        Object.values(gameState.players).forEach(otherPlayer => {
+        for (let otherPlayer of Object.values(gameState.players)) {
             if (otherPlayer.id !== player.id && otherPlayer.alive) {
-                otherPlayer.snake.forEach(segment => {
+                for (let segment of otherPlayer.snake) {
                     if (head.x === segment.x && head.y === segment.y) {
                         return true;
                     }
-                });
+                }
             }
-        });
+        }
     }
     
     return false;
@@ -173,10 +173,10 @@ function moveSnake(player) {
     
     // Modo Classic: Teleportar para o outro lado se sair das laterais
     if (gameState.gameMode === 'classic') {
-        if (head.x < 0) head.x = 580;
-        if (head.x >= 600) head.x = 0;
-        if (head.y < 0) head.y = 380;
-        if (head.y >= 400) head.y = 0;
+        if (head.x < 0) head.x = gameState.gameWidth - 20;
+        if (head.x >= gameState.gameWidth) head.x = 0;
+        if (head.y < 0) head.y = gameState.gameHeight - 20;
+        if (head.y >= gameState.gameHeight) head.y = 0;
     }
     
     player.snake.unshift(head);
@@ -463,9 +463,11 @@ setInterval(() => {
         }
     });
     
-    // Limpar power-ups antigos
+    // Limpar power-ups antigos (power-ups desaparecem após 15 segundos)
+    const now = Date.now();
     gameState.powerUps = gameState.powerUps.filter(powerUp => {
-        return Date.now() - powerUp.id < 15000;
+        // powerUp.id contém o timestamp de criação
+        return now - (powerUp.id - (powerUp.id % 1)) < 15000;
     });
     
     // Eventos da temporada (chance de 1% a cada loop)

@@ -47,7 +47,6 @@ let gameStarted = false;
 
 // Controle de movimento
 let lastDirection = null;
-let directionQueue = [];
 let lastMoveTime = 0;
 const MOVE_INTERVAL = 150;
 
@@ -239,14 +238,11 @@ function setupEventListeners() {
 function handleDirectionChange(direction) {
     const now = Date.now();
     
-    // Adicionar direÃ§Ã£o Ã  fila se for diferente da Ãºltima
+    // Enviar direção apenas se for diferente da última
     if (direction !== lastDirection) {
-        directionQueue.push(direction);
         lastDirection = direction;
+        socket.emit('changeDirection', direction);
     }
-    
-    // Enviar direÃ§Ã£o imediatamente para o servidor
-    socket.emit('changeDirection', direction);
 }
 
 function setupTabs() {
