@@ -6,7 +6,12 @@ const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -314,6 +319,11 @@ function startGame() {
 
 io.on('connection', (socket) => {
     console.log('Jogador conectado:', socket.id);
+    
+    // Handle connection errors
+    socket.on('connect_error', (error) => {
+        console.log('Erro de conexão:', error.message);
+    });
     
     gameState.players[socket.id] = {
         id: socket.id,

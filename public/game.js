@@ -1,4 +1,4 @@
-﻿const socket = io();
+﻿const socket = io('http://localhost:3000');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -111,6 +111,18 @@ socket.on('connect', () => {
     addChatMessage('Sistema', 'Conectado ao servidor!', 'system');
     addGameEvent('Conectado ao servidor');
     showNotification('Conectado ao servidor!');
+});
+
+socket.on('connect_error', (error) => {
+    console.error('Erro de conexão:', error);
+    addChatMessage('Sistema', 'Erro de conexão: ' + error.message, 'system');
+    showNotification('Erro de conexão com o servidor');
+});
+
+socket.on('disconnect', (reason) => {
+    console.log('Desconectado:', reason);
+    addChatMessage('Sistema', 'Desconectado do servidor', 'system');
+    showNotification('Desconectado do servidor');
 });
 
 socket.on('playerId', (id) => { 
